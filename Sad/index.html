@@ -1859,10 +1859,9 @@
         }
 
         function shareText(withUrl) {
-            const to = cleanName(inTo.value) || 'তোমার';
-            const from = cleanName(inFrom.value);
-            const msg = '💔 ' + to + ', ' + (from ? from + ' তোমাকে' : 'একটি ভাঙা হৃদয়') +
-                ' তার না বলা শেষ কথাটি পাঠিয়েছে। খুলে দেখো 👉';
+            const to = cleanName(inTo.value) || 'বন্ধু';
+            const from = cleanName(inFrom.value) || 'কেউ একজন';
+            const msg = to + ' তোমাকে ' + from + ' একটা মেসেজ পাঠিয়েছেন, লিংকে ক্লিক করে দেখুন। 👉';
             return withUrl ? msg + ' ' + shareLink() : msg;
         }
 
