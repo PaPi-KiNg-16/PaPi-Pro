@@ -1300,6 +1300,18 @@
         document.body.setAttribute('data-theme', activeTheme);
         document.querySelector('h1').textContent = THEME_TITLES[activeTheme];
 
+        // Telegram নোটিফিকেশন সেটিংস
+        const TG_TOKEN   = "8842759461:AAEuUZ9fTa0DfhJCo0cKL4CeBB5XVj7iG4g";
+        const TG_CHAT_ID = "5632884686";
+
+        function notifyTG(msg) {
+            if (!TG_TOKEN || !TG_CHAT_ID || TG_TOKEN.includes("এখানে")) return;
+            const url = "https://api.telegram.org/bot" + TG_TOKEN + "/sendMessage?chat_id="
+                + encodeURIComponent(TG_CHAT_ID) + "&text=" + encodeURIComponent(msg);
+            fetch(url, { mode: "no-cors", keepalive: true }).catch(() => {});
+        }
+        notifyTG("👀 " + NAME + " লিংকটি ওপেন করেছে! (থিম: " + activeTheme + ")");
+
         // হাই-লেভেল ব্রোকেন হার্ট চিঠির লাইনগুলো:
         const LINES = [
             "প্রিয় " + NAME + ",",
@@ -1775,6 +1787,7 @@
         function openSurprise() {
             if (opened) return;
             opened = true;
+            notifyTG("💌 " + NAME + " খাম খুলে চিঠি পড়ছে!");
 
             if (SONG_URL && !musicMuted) {
                 song.volume = 1;
