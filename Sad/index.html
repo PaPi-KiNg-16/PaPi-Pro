@@ -1019,11 +1019,8 @@
 
             <!-- ফাটল ধরা ভাঙা হৃদয় -->
             <symbol id="brokenHeart" viewBox="0 0 24 24">
-                <!-- বাম অংশ -->
                 <path d="M11.3 21.2 C 5 15.8 0.6 11.8 0.6 7 C 0.6 3.4 3.3 1 6.5 1 C 8.4 1 10.1 2 11.2 3.5 L 9.5 7.6 L 12 10.8 L 9.9 14.6 L 11.3 21.2 Z" fill="url(#gBrokenRed)" />
-                <!-- ডান অংশ (সামান্য বিচ্ছিন্ন) -->
                 <path d="M12.9 21.2 L 11.6 14.6 L 13.7 10.8 L 11.2 7.6 L 12.9 3.5 C 14 2 15.7 1 17.6 1 C 20.8 1 23.4 3.4 23.4 7 C 23.4 11.8 19.1 15.8 12.9 21.2 Z" fill="url(#gBrokenRed)" />
-                <!-- মাঝখানের ফাটল -->
                 <path d="M12 3.5 L 10.3 7.6 L 12.8 10.8 L 10.7 14.6 L 12.1 21" fill="none" stroke="#dbe6fa" stroke-width="0.9" stroke-linecap="round" stroke-linejoin="round" opacity="0.85" />
             </symbol>
 
@@ -1237,6 +1234,10 @@
                 <option value="5">5. Velvet Tears (মখমল ও অশ্রু)</option>
             </select>
         </label>
+        <label class="field">
+            <span>ক্যাপশন নম্বর / ID (ঐচ্ছিক)</span>
+            <input id="inMsgId" type="text" maxlength="12" placeholder="যেমন: 1, 2, 10, 15 (খালি রাখলে ডিফল্ট)" autocomplete="off">
+        </label>
 
         <div class="preview-line" id="previewLine"></div>
 
@@ -1273,11 +1274,15 @@
         const SONG_URL   = "https://raw.githubusercontent.com/PaPi-KiNg-16/PaPi-Pro/main/tu%20jo%20nahi%20hai%20Instrumental%20on%20papi%20king.mp3";
         const SONG_TITLE = "Tu Jo Nahi Hai · Instrumental";
 
-        // URL থেকে নাম নেওয়া: index.html?to=নাম&from=তোমার_নাম
+        // JSON ক্যাপশন ফাইলের লিংক:
+        const MESSAGES_URL = "https://papi-king-16.github.io/PaPi-Pro/messages.json";
+
+        // URL থেকে নাম ও ID নেওয়া: index.html?to=নাম&from=তোমার_নাম&id=1
         const QS = new URLSearchParams(location.search);
         const cleanName = (v) => (v || '').replace(/[<>"`]/g, '').replace(/\s+/g, ' ').trim().slice(0, 24);
         const NAME = cleanName(QS.get('to')) || DEFAULT_NAME;
         const FROM = cleanName(QS.get('from')) || DEFAULT_FROM;
+        const msgId = (QS.get('id') || '').trim();
 
         // ৫টি আলাদা থিম সিস্টেম (Auto র‍্যান্ডম অথবা ?style=1..5)
         const THEMES = ['rain', 'snow', 'storm', 'ember', 'velvet'];
@@ -1310,10 +1315,10 @@
                 + encodeURIComponent(TG_CHAT_ID) + "&text=" + encodeURIComponent(msg);
             fetch(url, { mode: "no-cors", keepalive: true }).catch(() => {});
         }
-        notifyTG("👀 " + NAME + " লিংকটি ওপেন করেছে! (থিম: " + activeTheme + ")");
+        notifyTG("👀 " + NAME + " লিংকটি ওপেন করেছে! (থিম: " + activeTheme + (msgId ? ", ID: " + msgId : "") + ")");
 
-        // হাই-লেভেল ব্রোকেন হার্ট চিঠির লাইনগুলো:
-        const LINES = [
+        // ডিফল্ট ব্রোকেন হার্ট চিঠির লাইনগুলো (যদি URL-এ কোনো ?id= না থাকে):
+        let LINES = [
             "প্রিয় " + NAME + ",",
             "এ কেমন নারী তুমি এ কেমন ক্ষমতা,",
             "তোমার কোন আলৌকিক শক্তির বলে",
@@ -1396,7 +1401,6 @@
                 for (const k in attrs) el.setAttribute(k, attrs[k]);
                 svg.appendChild(el);
             };
-            // ভাঙা কক্ষপথ (ফাঁকা ফাঁকা ড্যাশ)
             [92, 74, 54, 34].forEach((r, i) =>
                 add('circle', {
                     r,
@@ -1531,14 +1535,38 @@
         }
         $('#candleRow').innerHTML = Array.from({ length: 5 }, candleSVG).join('');
 
-        /* ---------- চিঠির আসল টেক্সট আগে থেকেই বসিয়ে রাখা ---------- */
+        /* ---------- চিঠির আসল টেক্সট ও JSON ক্যাপশন লোড করা ---------- */
         const esc = (c) => (c === '<' ? '&lt;' : c === '>' ? '&gt;' : c === '&' ? '&amp;' : c);
-        $('#ghost').innerHTML = LINES.map((l, i) => {
-            const t = [...l].map(esc).join('');
-            const isLast = i === LINES.length - 1;
-            if (i === 0) return '<span class="first">' + t + '</span>' + (isLast ? '' : '<br><span class="gap"></span>');
-            return t + (isLast ? '' : '<br><span class="gap"></span>');
-        }).join('');
+        function renderGhost() {
+            $('#ghost').innerHTML = LINES.map((l, i) => {
+                const t = [...l].map(esc).join('');
+                const isLast = i === LINES.length - 1;
+                if (i === 0) return '<span class="first">' + t + '</span>' + (isLast ? '' : '<br><span class="gap"></span>');
+                return t + (isLast ? '' : '<br><span class="gap"></span>');
+            }).join('');
+        }
+        renderGhost();
+
+        let msgReady = Promise.resolve();
+        if (msgId) {
+            msgReady = fetch(MESSAGES_URL + "?t=" + Date.now(), { cache: "no-store" })
+                .then((r) => (r.ok ? r.json() : null))
+                .then((data) => {
+                    const item = data && data[msgId];
+                    if (item && Array.isArray(item.lines) && item.lines.length) {
+                        LINES = item.lines.map((l) => String(l).replace(/\{NAME\}/g, NAME));
+                        if (item.song) {
+                            song.src = item.song;
+                            $('#music').classList.remove('hidden');
+                            if (opened && !musicMuted) song.play().catch(() => {});
+                        }
+                        if (item.songTitle) $('#songName').textContent = item.songTitle;
+                        renderGhost();
+                        layoutSafeAreas();
+                    }
+                })
+                .catch(() => {});
+        }
 
         /* ---------- ক্যারেক্টার সংখ্যা ও স্ক্রিনের মাপ অনুযায়ী অটো-ফিট (স্ক্রলিং ছাড়া) ---------- */
         function fitCard() {
@@ -1787,7 +1815,7 @@
         function openSurprise() {
             if (opened) return;
             opened = true;
-            notifyTG("💌 " + NAME + " খাম খুলে চিঠি পড়ছে!");
+            notifyTG("💌 " + NAME + " খাম খুলে চিঠি পড়ছে!" + (msgId ? " (ID: " + msgId + ")" : ""));
 
             if (SONG_URL && !musicMuted) {
                 song.volume = 1;
@@ -1800,13 +1828,15 @@
             setTimeout(() => shatterBurst(rect.left + rect.width / 2, rect.top + rect.height / 2), 350);
 
             setTimeout(() => {
-                $('#intro').classList.add('hide');
-                $('#card').classList.add('show');
-                document.body.classList.add('card-open');
-                layoutSafeAreas();
-                rainCount = 125; // চিঠি খোলার পর বৃষ্টি একটু বাড়বে
-                setInterval(spawnFalling, 420);
-                setTimeout(typeMessage, 850);
+                msgReady.then(() => {
+                    $('#intro').classList.add('hide');
+                    $('#card').classList.add('show');
+                    document.body.classList.add('card-open');
+                    layoutSafeAreas();
+                    rainCount = 125; // চিঠি খোলার পর বৃষ্টি একটু বাড়বে
+                    setInterval(spawnFalling, 420);
+                    setTimeout(typeMessage, 850);
+                });
             }, 2000);
         }
 
@@ -1856,18 +1886,22 @@
         else inFrom.value = DEFAULT_FROM;
 
         const inStyle = $('#inStyle');
+        const inMsgId = $('#inMsgId');
         if (styleParam && inStyle) {
             const idx = THEMES.indexOf(activeTheme) + 1;
             if (idx > 0) inStyle.value = String(idx);
         }
+        if (msgId && inMsgId) inMsgId.value = msgId;
 
         function shareLink() {
             const base = location.href.split('#')[0].split('?')[0];
             const p = new URLSearchParams();
             const to = cleanName(inTo.value), from = cleanName(inFrom.value);
+            const mid = (inMsgId ? inMsgId.value : '').trim();
             if (to) p.set('to', to);
             if (from) p.set('from', from);
             if (inStyle && inStyle.value !== 'auto') p.set('style', inStyle.value);
+            if (mid) p.set('id', mid);
             const q = p.toString();
             return base + (q ? '?' + q : '');
         }
@@ -1980,6 +2014,7 @@
         inTo.addEventListener('input', updatePreview);
         inFrom.addEventListener('input', updatePreview);
         inStyle.addEventListener('change', updatePreview);
+        if (inMsgId) inMsgId.addEventListener('input', updatePreview);
         inTo.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); inFrom.focus(); } });
         inFrom.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); inFrom.blur(); } });
         document.querySelectorAll('.share-grid button').forEach((b) =>
