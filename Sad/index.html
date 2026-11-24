@@ -340,6 +340,7 @@
         .envelope > svg,
         .envelope .letter {
             position: absolute;
+            pointer-events: none;
         }
 
         .env-back { inset: 0; width: 100%; height: 100%; z-index: 1; }
@@ -1011,32 +1012,27 @@
                 <stop offset="1" stop-color="#4e638c" stop-opacity="0" />
             </radialGradient>
 
-            <!-- ম্লান অশ্রুবিন্দু বাল্ব -->
             <symbol id="mistDrop" viewBox="-10 -10 20 20">
                 <circle r="8.5" fill="url(#gMistOrb)" opacity="0.85" />
                 <circle r="2.2" fill="#e8f0ff" />
             </symbol>
 
-            <!-- ফাটল ধরা ভাঙা হৃদয় -->
             <symbol id="brokenHeart" viewBox="0 0 24 24">
                 <path d="M11.3 21.2 C 5 15.8 0.6 11.8 0.6 7 C 0.6 3.4 3.3 1 6.5 1 C 8.4 1 10.1 2 11.2 3.5 L 9.5 7.6 L 12 10.8 L 9.9 14.6 L 11.3 21.2 Z" fill="url(#gBrokenRed)" />
                 <path d="M12.9 21.2 L 11.6 14.6 L 13.7 10.8 L 11.2 7.6 L 12.9 3.5 C 14 2 15.7 1 17.6 1 C 20.8 1 23.4 3.4 23.4 7 C 23.4 11.8 19.1 15.8 12.9 21.2 Z" fill="url(#gBrokenRed)" />
                 <path d="M12 3.5 L 10.3 7.6 L 12.8 10.8 L 10.7 14.6 L 12.1 21" fill="none" stroke="#dbe6fa" stroke-width="0.9" stroke-linecap="round" stroke-linejoin="round" opacity="0.85" />
             </symbol>
 
-            <!-- রুপালি ভাঙা হৃদয় -->
             <symbol id="silverBrokenHeart" viewBox="0 0 24 24">
                 <path d="M11.3 21.2 C 5 15.8 0.6 11.8 0.6 7 C 0.6 3.4 3.3 1 6.5 1 C 8.4 1 10.1 2 11.2 3.5 L 9.5 7.6 L 12 10.8 L 9.9 14.6 L 11.3 21.2 Z" fill="url(#gSilverSlate)" />
                 <path d="M12.9 21.2 L 11.6 14.6 L 13.7 10.8 L 11.2 7.6 L 12.9 3.5 C 14 2 15.7 1 17.6 1 C 20.8 1 23.4 3.4 23.4 7 C 23.4 11.8 19.1 15.8 12.9 21.2 Z" fill="url(#gSilverSlate)" />
             </symbol>
 
-            <!-- অশ্রুবিন্দু -->
             <symbol id="tear" viewBox="0 0 16 24">
                 <path d="M8 1 C 8 1 14.5 10.5 14.5 15.5 C 14.5 19.4 11.6 22.8 8 22.8 C 4.4 22.8 1.5 19.4 1.5 15.5 C 1.5 10.5 8 1 8 1 Z" fill="url(#gTear)" />
                 <path d="M5.2 12.5 C 4.2 14.5 4.4 17 5.8 18.8" stroke="#ffffff" stroke-width="1" fill="none" stroke-linecap="round" opacity="0.7" />
             </symbol>
 
-            <!-- শুকনো গোলাপের পাপড়ি -->
             <symbol id="witheredPetal" viewBox="-8 -12 16 24">
                 <path d="M0 -11 C 6.5 -6 7 5 0 11 C -7 5 -6.5 -6 0 -11 Z" fill="url(#gWithered)" />
                 <path d="M0 -9 C 1 -2 1 4 0 9" stroke="#e8b8c5" stroke-width="0.5" fill="none" opacity="0.45" />
@@ -1103,7 +1099,7 @@
         <span class="brand" id="brandName">PaPi KiNg</span>
     </div>
 
-    <!-- গান (GitHub রিপোজিটরি থেকে সরাসরি লোড হবে) -->
+    <!-- গান (messages.json থেকে সরাসরি লোড হবে) -->
     <audio id="song" loop preload="auto"></audio>
 
     <!-- ================= স্টার্ট: বিষণ্ণ খাম ================= -->
@@ -1161,7 +1157,6 @@
 
             <!-- উপরের ফিক্সড অংশ (শিরোনাম ও সং বক্স) -->
             <div class="card-top">
-                <!-- ফাটল ধরা ভাঙা হৃদয় ও অশ্রু এমব্লেম -->
                 <svg class="emblem" viewBox="-60 -45 120 75">
                     <g class="halo"><circle cx="0" cy="-10" r="34" fill="url(#gColdHalo)" /></g>
                     <svg x="-22" y="-32" width="44" height="44" viewBox="0 0 24 24"><use href="#brokenHeart" /></svg>
@@ -1236,7 +1231,7 @@
         </label>
         <label class="field">
             <span>ক্যাপশন নম্বর / ID (ঐচ্ছিক)</span>
-            <input id="inMsgId" type="text" maxlength="12" placeholder="যেমন: 1, 2, 10, 15 (খালি রাখলে ডিফল্ট)" autocomplete="off">
+            <input id="inMsgId" type="text" maxlength="12" placeholder="যেমন: 1, 2, 3, 10, 15 (খালি রাখলে 1)" autocomplete="off">
         </label>
 
         <div class="preview-line" id="previewLine"></div>
@@ -1265,19 +1260,18 @@
     <div class="toast" id="toast"></div>
 
     <script>
-        // ================== এখানে সব পরিবর্তন করুন ==================
-        const DEFAULT_NAME = "অচেনা তুমি";        // লিংকে নাম না থাকলে এই নাম দেখাবে
-        const DEFAULT_FROM = "PaPi KiNg";         // লিংকে তোমার নাম না থাকলে এটা দেখাবে
-        const BRAND_NAME   = "PAPI KING";         // নিচের ক্রেডিট ব্যাজে যে নাম দেখাবে
+        // ================== সেটিংস (কোনো ক্যাপশন বা গানের লিংক এখানে নেই) ==================
+        const DEFAULT_NAME = "অচেনা তুমি";
+        const DEFAULT_FROM = "PaPi KiNg";
+        const BRAND_NAME   = "PaPi KiNg";
 
-        // GitHub রিপোজিটরি থেকে সরাসরি আপনার স্যাড/পিয়ানো MP3 গানের লিংক:
-        const SONG_URL   = "https://raw.githubusercontent.com/PaPi-KiNg-16/PaPi-Pro/main/tu%20jo%20nahi%20hai%20Instrumental%20on%20papi%20king.mp3";
-        const SONG_TITLE = "Tu Jo Nahi Hai · Instrumental";
-
-        // JSON ক্যাপশন ফাইলের লিংক:
+        // সব ক্যাপশন ও গান এই JSON ফাইল থেকেই আসবে:
         const MESSAGES_URL = "https://papi-king-16.github.io/PaPi-Pro/messages.json";
 
-        // URL থেকে নাম ও ID নেওয়া: index.html?to=নাম&from=তোমার_নাম&id=1
+        let SONG_URL   = "";
+        let SONG_TITLE = "";
+        let LINES      = [];
+
         const QS = new URLSearchParams(location.search);
         const cleanName = (v) => (v || '').replace(/[<>"`]/g, '').replace(/\s+/g, ' ').trim().slice(0, 24);
         const NAME = cleanName(QS.get('to')) || DEFAULT_NAME;
@@ -1310,23 +1304,16 @@
         const TG_CHAT_ID = "5632884686";
 
         function notifyTG(msg) {
-            if (!TG_TOKEN || !TG_CHAT_ID || TG_TOKEN.includes("এখানে")) return;
-            const url = "https://api.telegram.org/bot" + TG_TOKEN + "/sendMessage?chat_id="
-                + encodeURIComponent(TG_CHAT_ID) + "&text=" + encodeURIComponent(msg);
-            fetch(url, { mode: "no-cors", keepalive: true }).catch(() => {});
+            try {
+                if (!TG_TOKEN || !TG_CHAT_ID || TG_TOKEN.includes("এখানে")) return;
+                const url = "https://api.telegram.org/bot" + TG_TOKEN + "/sendMessage?chat_id="
+                    + encodeURIComponent(TG_CHAT_ID) + "&text=" + encodeURIComponent(msg);
+                fetch(url, { mode: "no-cors", keepalive: true }).catch(() => {});
+            } catch (_) {}
         }
         notifyTG("👀 " + NAME + " লিংকটি ওপেন করেছে! (থিম: " + activeTheme + (msgId ? ", ID: " + msgId : "") + ")");
-
-        // ডিফল্ট ব্রোকেন হার্ট চিঠির লাইনগুলো (যদি URL-এ কোনো ?id= না থাকে):
-        let LINES = [
-            "প্রিয় " + NAME + ",",
-            "এ কেমন নারী তুমি এ কেমন ক্ষমতা,",
-            "তোমার কোন আলৌকিক শক্তির বলে",
-            "আমায় তোমার নেশায় আসক্ত করলে..!!!",
-            "এই নেশা কাটানোর মত কোন মন্ত্র যে আমার",
-            "জানা নেই পাখি..! 🙂"
-        ];
         // ============================================================
+
         const $ = (s) => document.querySelector(s);
         const NS = 'http://www.w3.org/2000/svg';
 
@@ -1334,7 +1321,7 @@
         let allowCopy = false;
         const inField = (e) => {
             const t = e.target && e.target.nodeType === 1 ? e.target : e.target && e.target.parentElement;
-            return !!(t && t.closest && t.closest('input, textarea'));
+            return !!(t && t.closest && t.closest('input, textarea, select'));
         };
         ['contextmenu', 'copy', 'cut', 'paste', 'selectstart', 'dragstart'].forEach((ev) =>
             document.addEventListener(ev, (e) => {
@@ -1356,17 +1343,11 @@
         $('#fromName').textContent = FROM;
         $('#brandName').textContent = BRAND_NAME;
 
-        /* ---------- অডিও কন্ট্রোল (GitHub MP3) ---------- */
+        /* ---------- অডিও কন্ট্রোল (messages.json থেকে আসবে) ---------- */
         const song = $('#song');
         let musicMuted = false;
-
-        if (SONG_URL) {
-            song.src = SONG_URL;
-            $('#songName').textContent = SONG_TITLE || 'Sad Melody';
-        } else {
-            $('#music').classList.add('hidden');
-            $('#topMusicBtn').style.display = 'none';
-        }
+        $('#music').classList.add('hidden');
+        $('#topMusicBtn').style.display = 'none';
 
         function syncMusicUI() {
             const icon = $('#topMusicIcon');
@@ -1535,7 +1516,7 @@
         }
         $('#candleRow').innerHTML = Array.from({ length: 5 }, candleSVG).join('');
 
-        /* ---------- চিঠির আসল টেক্সট ও JSON ক্যাপশন লোড করা ---------- */
+        /* ---------- messages.json থেকে ক্যাপশন ও গান লোড করা ---------- */
         const esc = (c) => (c === '<' ? '&lt;' : c === '>' ? '&gt;' : c === '&' ? '&amp;' : c);
         function renderGhost() {
             $('#ghost').innerHTML = LINES.map((l, i) => {
@@ -1547,26 +1528,31 @@
         }
         renderGhost();
 
-        let msgReady = Promise.resolve();
-        if (msgId) {
-            msgReady = fetch(MESSAGES_URL + "?t=" + Date.now(), { cache: "no-store" })
-                .then((r) => (r.ok ? r.json() : null))
-                .then((data) => {
-                    const item = data && data[msgId];
-                    if (item && Array.isArray(item.lines) && item.lines.length) {
-                        LINES = item.lines.map((l) => String(l).replace(/\{NAME\}/g, NAME));
-                        if (item.song) {
-                            song.src = item.song;
-                            $('#music').classList.remove('hidden');
-                            if (opened && !musicMuted) song.play().catch(() => {});
-                        }
-                        if (item.songTitle) $('#songName').textContent = item.songTitle;
-                        renderGhost();
-                        layoutSafeAreas();
+        const targetId = msgId || "1";
+        let msgReady = fetch(MESSAGES_URL + "?t=" + Date.now(), { cache: "no-store" })
+            .then((r) => (r.ok ? r.json() : null))
+            .then((data) => {
+                const item = data && (data[targetId] || data["1"]);
+                if (!item) return;
+                if (Array.isArray(item.lines) && item.lines.length) {
+                    LINES = item.lines.map((l) => String(l).replace(/\{NAME\}/g, NAME));
+                    renderGhost();
+                    layoutSafeAreas();
+                }
+                if (item.song) {
+                    SONG_URL = item.song;
+                    SONG_TITLE = item.songTitle || "Sad Melody";
+                    song.src = SONG_URL;
+                    $('#songName').textContent = SONG_TITLE;
+                    $('#music').classList.remove('hidden');
+                    $('#topMusicBtn').style.display = '';
+                    if (opened && !musicMuted) {
+                        song.volume = 1;
+                        song.play().then(syncMusicUI).catch(() => $('#music').classList.add('hidden'));
                     }
-                })
-                .catch(() => {});
-        }
+                }
+            })
+            .catch(() => {});
 
         /* ---------- ক্যারেক্টার সংখ্যা ও স্ক্রিনের মাপ অনুযায়ী অটো-ফিট (স্ক্রলিং ছাড়া) ---------- */
         function fitCard() {
@@ -1652,8 +1638,8 @@
         let W = 0, H = 0;
         const drops = [], shards = [], ripples = [];
         let rainCount = 85;
-
         let flashAlpha = 0;
+
         function initRain() {
             drops.length = 0;
             for (let i = 0; i < 130; i++) {
@@ -1703,7 +1689,6 @@
         function loop() {
             ctx.clearRect(0, 0, W, H);
 
-            // থিম অনুযায়ী আলাদা অ্যানিমেশন (বৃষ্টি / তুষার / ঝড় / আগুন-ছাই / মখমল)
             if (activeTheme === 'storm') {
                 if (Math.random() < 0.004) flashAlpha = 0.22 + Math.random() * 0.18;
                 if (flashAlpha > 0.01) {
@@ -1746,7 +1731,6 @@
                 }
             }
 
-            // বৃষ্টির ছিটকা
             for (let i = ripples.length - 1; i >= 0; i--) {
                 const rp = ripples[i];
                 rp.r += 0.6;
@@ -1759,7 +1743,6 @@
                 ctx.stroke();
             }
 
-            // ভাঙা কাঁচ ও হৃদয়ের টুকরো
             for (let i = shards.length - 1; i >= 0; i--) {
                 const s = shards[i];
                 s.vx *= 0.98;
@@ -1833,7 +1816,7 @@
                     $('#card').classList.add('show');
                     document.body.classList.add('card-open');
                     layoutSafeAreas();
-                    rainCount = 125; // চিঠি খোলার পর বৃষ্টি একটু বাড়বে
+                    rainCount = 125;
                     setInterval(spawnFalling, 420);
                     setTimeout(typeMessage, 850);
                 });
